@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Col, Row, Container} from 'reactstrap';
 import Header from '../header';
 import RandomChar from '../randomChar';
@@ -7,6 +7,9 @@ import CharDetails from '../charDetails';
 
 
 const App = () => {
+
+	const [selectedCharacter, changeCharSelect] = useState(null);
+
     return (
         <> 
             <Container>
@@ -20,10 +23,10 @@ const App = () => {
                 </Row>
                 <Row>
                     <Col md='6'>
-                        <ItemList />
+                        <ItemList changeSelect = {changeCharSelect}  selectedCharacter ={selectedCharacter}/>
                     </Col>
                     <Col md='6'>
-                        <CharDetails />
+                        <CharDetails id = {selectedCharacter}/>
                     </Col>
                 </Row>
             </Container>

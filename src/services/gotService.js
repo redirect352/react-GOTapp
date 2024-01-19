@@ -39,6 +39,7 @@ export default class GotService {
 
 	_transformCharacter (character){
 		return{
+			id : +character.url.match('\\d{1,}')[0] ?? null,
 			name : character.name,
 			gender : character.gender,
 			born : character.born,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './randomChar.css';
 import styled from "styled-components";
 import { Button, ListGroup, ListGroupItem, Spinner } from "reactstrap";
@@ -39,12 +39,25 @@ const loadStates = {loading : 'loading', successed : 'successed', erorred : 'err
 
 const RandomChar = () => {
 	const [charId, changeCharId] = useState(false);
+	const timer = useRef(null);
 	const onClick = ()=>{
-		changeCharId(charId ?null : Math.floor(Math.random()*140+25))
+		changeCharId(charId ?null : Math.floor(Math.random()*140+25));
 	}
+	useEffect (()=>{
+			if(charId){
+				timer.current = setTimeout(()=>changeCharId( Math.floor(Math.random()*140+25)),2500);
+			}else{
+				if(timer.current){
+					clearTimeout(timer.current);
+					timer.current = null;
+				}
+			}
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	,[charId])
+
 	const randomCharContent = charId ? <RandomCharBlock id = {charId}/> : null;
 	const randomButtonText = charId ? 'Скрыть':'Показать случайного персонажа'
-
 	return(
 		<>
 			{randomCharContent}
@@ -76,8 +89,6 @@ const RandomCharBlock = ({id}) => {
 		.catch(onError);
 	},[id])
 
-	console.log(loadState);
-
 	if(loadState === loadStates.loading){
 		return (
 			<RandomBlock className="rounded">
@@ -93,7 +104,6 @@ const RandomCharBlock = ({id}) => {
 			</RandomBlock>
 		)
 	}else {
-		console.log(3);
 		return(
 			<RandomBlock className="rounded">
 				<ErrorMessage message={error}/>
@@ -103,24 +113,34 @@ const RandomCharBlock = ({id}) => {
 }
 
 const View = ({characterData})=>{
+	const {name, gender, born, died, culture} = characterData;
+
+	const showContent = (content) =>{
+		if(content && content !== '')
+			return content;
+		else
+			return 'no info';
+
+	}
+
 	return (<>
-				<RandomBlockHeader>Random Character: {characterData.name ?? '-'}</RandomBlockHeader>
+				<RandomBlockHeader>Random Character: {name ?? '-'}</RandomBlockHeader>
 				<ListGroup flush>
 					<ListItem>
 						<ItemLabel className="term">Gender </ItemLabel>
-						<ItemContent>{characterData.gender ?? '-'}</ItemContent>
+						<ItemContent>{showContent(gender)}</ItemContent>
 					</ListItem>
 					<ListItem>
 						<ItemLabel className="term">Born </ItemLabel>
-						<ItemContent>{characterData.born ?? '-'}</ItemContent>
+						<ItemContent>{showContent(born)}</ItemContent>
 					</ListItem>
 					<ListItem>
 						<ItemLabel className="term">Died </ItemLabel>
-						<ItemContent>{characterData.died ?? '-'}</ItemContent>
+						<ItemContent>{showContent(died)}</ItemContent>
 					</ListItem>
 					<ListItem>
 						<ItemLabel className="term">Culture </ItemLabel>
-						<ItemContent>{characterData.culture ?? '-'}</ItemContent>
+						<ItemContent>{showContent(culture)}</ItemContent>
 					</ListItem>
 				</ListGroup>
 			</>
