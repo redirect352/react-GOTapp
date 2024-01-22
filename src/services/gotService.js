@@ -21,7 +21,6 @@ export default class GotService {
 
 	async getAllHouses (){
 		const res = await this.getResourse('/houses?page=1');
-		console.log(res);
 		return res.map(this._transformHouse);
 	}
 	async getHouse(id){

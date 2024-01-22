@@ -12,7 +12,7 @@ const gotService = new GotService();
 const HousePage =()=>{
 	const [selectedHouse, changeHouseSelect] = useState(null);
 
-	const charsList = (
+	const housesList = (
 		<ItemList 
 			changeSelect = {changeHouseSelect}  
 			selectedItem ={selectedHouse}
@@ -20,7 +20,7 @@ const HousePage =()=>{
 			renderItem  = {item => item.name}
 			/>
 	);
-	const charDetails = (
+	const houseDetails = (
 		<ItemDetails 
 			itemSelected = {selectedHouse !== null} 
 			loadItem={() => gotService.getHouse(selectedHouse)}
@@ -52,8 +52,8 @@ const HousePage =()=>{
 	return (
 		<PageContainer>
 			<RowBlock 
-				left={charsList} 
-				right={charDetails}
+				left={housesList} 
+				right={houseDetails}
 				/>
 		</PageContainer>
 	);
