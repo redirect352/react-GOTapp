@@ -21,6 +21,7 @@ export default class GotService {
 
 	async getAllHouses (){
 		const res = await this.getResourse('/houses?page=1');
+		console.log(res);
 		return res.map(this._transformHouse);
 	}
 	async getHouse(id){
@@ -50,6 +51,7 @@ export default class GotService {
 
 	_transformHouse (house){
 		return{
+			id : +house.url.match('\\d{1,}')[0] ?? null,
 			name : house.name,
 			region : house.region,
 			words : house.words,
@@ -60,6 +62,7 @@ export default class GotService {
 	}
 	_transformBook (book){
 		return{
+			id : +book.url.match('\\d{1,}')[0] ?? null,
 			name : book.name,
 			numberOfPages : book.numberOfPages,
 			publisher : book.publisher,

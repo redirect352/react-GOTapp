@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './charDetails.css';
 import { ListGroup, ListGroupItem } from "reactstrap";
 import styled from "styled-components";
-import GotService from "../../services/gotService";
 import Spinner from "../spinner";
 import ErrorMessage from "../errorMessage";
 
@@ -29,23 +27,14 @@ const ItemContent = styled.span`
 `
 
 const loadStates = {loading : 'loading', successed : 'successed', erorred : 'errored'}
-const gotService = new GotService();
 
-const defaultCharacterData = {
-	name : null,
-	gender : null,
-	born : null,
-	died : null,
-	culture : null,
-};
-
-const CharDetails =({id})=>{
-	const [character, updateCharacter] = useState(defaultCharacterData);
+const ItemDetails =({itemSelected = false, loadItem = async () => {throw new Error('No item load methode provided')}, renderHeader,children})=>{
+	const [item, updateItem] = useState(null);
 	const [loadState, changeLoadState] = useState(loadStates.loading); 
 	const [error, setError] = useState(null);
 	
-	const onCharacterLoaded = (loadedCharacter) => {
-		updateCharacter(loadedCharacter)
+	const onItemLoaded = (loadedCharacter) => {
+		updateItem(loadedCharacter)
 		changeLoadState(loadStates.successed);
 	};
 	const onError = (error) => {
@@ -55,19 +44,27 @@ const CharDetails =({id})=>{
 	}
 
 	useEffect(()=>{
-		if(id){
-			gotService.getCharacter(id)
-			.then(onCharacterLoaded)
+		if(itemSelected){
+			loadItem()
+			.then(onItemLoaded)
 			.catch(onError);
 		}
-	},[id]);
-
-	const spinner = loadState === loadStates.loading ? <Spinner/> : null;
-	const content = loadState === loadStates.successed ?<View {...character}/> : null;
+	},[itemSelected, loadItem]);
+	const noItemSelected = !itemSelected  ? <View header = {'Select something...'}/> : null;
+	const spinner = loadState === loadStates.loading && itemSelected ? <Spinner/> : null;
+	
+	const content = loadState === loadStates.successed ? 
+				<View header={renderHeader(item)}>
+					{children.map((child)=>{
+						return React.cloneElement(child,{item})
+					})}
+				</View> : null;
+	
 	const errorMessage = loadState === loadStates.erorred ? <ErrorMessage message={error}/> : null;
 
 	return (
 		<DetailsContainer className="rounded">
+			{noItemSelected}
 			{spinner}
 			{content}
 			{errorMessage}
@@ -76,37 +73,30 @@ const CharDetails =({id})=>{
     
 }
 
-const View = ({name, gender, born, died, culture})=>{
+const ItemField = ({label, field, item}) => {
 	const showContent = (content) =>{
 		if(content && content !== '')
 			return content;
 		else
-			return 'no info';
-
+			return (<span style={{color:'gray'}}>{'<no info>'}</span>);
 	}
+	return(
+		<ListItem>
+			<ItemLabel className="term">{label} </ItemLabel>
+			<ItemContent>{showContent(item[field])}</ItemContent>
+		</ListItem>
+	);
+}
 
+const View = ({header, children})=>{
 	return (<>
-				<DetailtsHeader>{name ?? '-'}</DetailtsHeader>
+				<DetailtsHeader>{header ?? '-'}</DetailtsHeader>
 				<ListGroup flush>
-					<ListItem>
-						<ItemLabel className="term">Gender </ItemLabel>
-						<ItemContent>{showContent(gender)}</ItemContent>
-					</ListItem>
-					<ListItem>
-						<ItemLabel className="term">Born </ItemLabel>
-						<ItemContent>{showContent(born)}</ItemContent>
-					</ListItem>
-					<ListItem>
-						<ItemLabel className="term">Died </ItemLabel>
-						<ItemContent>{showContent(died)}</ItemContent>
-					</ListItem>
-					<ListItem>
-						<ItemLabel className="term">Culture </ItemLabel>
-						<ItemContent>{showContent(culture)}</ItemContent>
-					</ListItem>
+					{children}
 				</ListGroup>
 			</>
 	);
 }
 
-export default CharDetails;
+export {ItemField};
+export default ItemDetails;
