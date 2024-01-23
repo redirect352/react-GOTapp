@@ -25,7 +25,7 @@ const CharacterPage =()=>{
 	const charDetails = (
 		<ItemDetails 
 			itemSelected = {selectedCharacter!==null} 
-			loadItem={() => gotService.getCharacter(selectedCharacter)}
+			loadItem={() =>  gotService.getCharacter(selectedCharacter)}
 			renderHeader={item => item.name}
 			>
 			<ItemField 
@@ -51,7 +51,7 @@ const CharacterPage =()=>{
 		<PageContainer>
 			<Row>
 				<Col lg={{size: 5, offset: 0}}>
-					<RandomChar/>
+					<RandomChar interval={1000}/>
 				</Col>
 			</Row>
 			<RowBlock 

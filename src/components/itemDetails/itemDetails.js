@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ListGroup, ListGroupItem } from "reactstrap";
 import styled from "styled-components";
 import Spinner from "../spinner";
 import ErrorMessage from "../errorMessage";
+import useLoader, { loadStates } from "../../hooks/useLoader";
 
 const DetailsContainer = styled.div`
 	background-color: #fff;
@@ -26,30 +27,8 @@ const ItemLabel = styled.span`
 const ItemContent = styled.span`
 `
 
-const loadStates = {loading : 'loading', successed : 'successed', erorred : 'errored'}
-
 const ItemDetails =({itemSelected = false, loadItem = async () => {throw new Error('No item load methode provided')}, renderHeader,children})=>{
-	const [item, updateItem] = useState(null);
-	const [loadState, changeLoadState] = useState(loadStates.loading); 
-	const [error, setError] = useState(null);
-	
-	const onItemLoaded = (loadedCharacter) => {
-		updateItem(loadedCharacter)
-		changeLoadState(loadStates.successed);
-	};
-	const onError = (error) => {
-		console.error(error);
-		setError(error.message);
-		changeLoadState(loadStates.erorred);
-	}
-
-	useEffect(()=>{
-		if(itemSelected){
-			loadItem()
-			.then(onItemLoaded)
-			.catch(onError);
-		}
-	},[itemSelected, loadItem]);
+	const {loadState, error, content : item} = useLoader( itemSelected ? loadItem : null);
 	const noItemSelected = !itemSelected  ? <View header = {'Select something...'}/> : null;
 	const spinner = loadState === loadStates.loading && itemSelected ? <Spinner/> : null;
 	
